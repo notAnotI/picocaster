@@ -1,0 +1,5 @@
+{
+    "texter names": [all the names of the textures]
+    "the name of the texture" : [[xpos, ypos, width, height, [R, G, B]<-(0 to 255) ]<-(rectangle information)]<-(a list of al the rectangles in this textures)
+
+}
