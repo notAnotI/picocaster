@@ -10,7 +10,7 @@ p3=(3*m.pi)/2
 dr=0.0174533
 
 global spx,spy,spz,spa
-spx,spy,spz,spa=1.5*64.0,5*64.0,20.0,0
+spx,spy,spz,spa=1.55*64.0,5*64.0,20.0,0
 
 global px,py,pdx,pdy,pa
 px = 1.5*64.0
@@ -19,48 +19,27 @@ pdx = 0
 pdy = -1
 pa = 90
 
+
+a,b,c = None,door("door"),wall("brick")
 mapW= [
-    1,1,1,1,1,1,1,1,
-    1,0,0,1,0,1,0,1,
-    1,0,0,1,0,0,0,1,
-    1,1,1,1,0,0,0,1,
-    1,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,1,1,
-    1,1,1,1,1,1,1,1,
+    c,c,c,c,c,c,c,c,
+    c,a,a,c,a,a,a,c,
+    c,a,a,b,a,a,a,c,
+    c,c,b,c,a,a,a,c,
+    c,a,a,a,a,a,a,c,
+    c,a,a,a,a,a,a,c,
+    c,a,a,a,a,a,a,c,
+    c,c,c,c,c,c,c,c,
 ]
-global texters_wall,texters_sprite,wall_texters
+
+
+global texters_sprite,wall_texters
 with open("assets/sprites.json","r") as f:
     texters_sprite=json.loads(f.read())
 
 with open("assets/walls.json","r") as f:
     wall_texters=json.loads(f.read())
 
-
-c3=0B1111111111111111
-c2=0B0101100000000000
-c1=0B0100010011000011
-c0=0B0000010011000001
-
-texters_wall=[
-    c0,c0,c0,c1,c0,c0,c0,c1,
-    c1,c1,c1,c1,c1,c1,c1,c1,
-    c0,c1,c0,c0,c0,c1,c0,c0,
-    c1,c1,c1,c1,c1,c1,c1,c1,
-    c0,c0,c0,c1,c0,c0,c0,c1,
-    c1,c1,c1,c1,c1,c1,c1,c1,
-    c0,c1,c0,c0,c0,c1,c0,c0,
-    c1,c1,c1,c1,c1,c1,c1,c1,
-
-    c2,c2,c2,c2,c2,c2,c2,c2,
-    c2,c3,c3,c2,c2,c3,c3,c2,
-    c2,c3,c3,c2,c2,c3,c3,c2,
-    c2,c3,c2,c2,c2,c2,c3,c2,
-    c2,c3,c2,c2,c2,c2,c3,c2,
-    c2,c3,c3,c2,c2,c3,c3,c2,
-    c2,c3,c3,c2,c2,c3,c3,c2,
-    c2,c2,c2,c2,c2,c2,c2,c2,
-    ]
 
 
 def dist(ax,ay,bx,by):
@@ -106,8 +85,8 @@ def draw_sprites(rects):
 
 
 def drawRays2D(rects):
-    vmt=0
-    hmt=0
+    vmt=wall("brick")
+    hmt=wall("brick")
     ra=(degToRad(FixAng(-pa)))-dr*40
 
     if ra<0: ra+=2*m.pi
@@ -143,9 +122,9 @@ def drawRays2D(rects):
             my=int(ry)>>6
             mp= my*mapX+mx
 
-            if mp>0 and mp<mapX*mapY and mapW[mp]>0:
+            if mp>0 and mp<mapX*mapY and mapW[mp]!=None:
                 dof=8
-                hmt=mapW[mp]-1
+                hmt=mapW[mp]
 
 
                 hx=rx
@@ -186,12 +165,12 @@ def drawRays2D(rects):
             mx=int(rx)>>6
             my=int(ry)>>6
             mp= my*mapX+mx
-            if mp>0 and mp<64 and mp<mapX*mapY and mapW[mp]>0:
+            if mp>0 and mp<64 and mp<mapX*mapY and mapW[mp]!=None:
                 dof=8
                 vx=rx
                 vy=ry
                 distV=dist(px,py,vx,vy)
-                vmt=mapW[mp]-1
+                vmt=mapW[mp]
                 vwall=(int(vy)-((int(vy)>>6)<<6))>>1
             else:
                 rx+=xo
@@ -218,28 +197,9 @@ def drawRays2D(rects):
         lineH=int((mapS*128)/disTT)
         lineOff = 128 - (lineH>>1)
 
-
-        '''
-        rect=[]
-        for pp in range(0,8):
-            c=texters_wall[((8*pp)+(64*tmt))+wall]
-
-            y1=lineOff-64+((lineOff+int(lineH/8*pp))-64)-(lineOff-64)
-            y2=(((lineOff+int(lineH/8))-64)-(lineOff-64))+1
-
-            if y1     <     0: y2+=y1;y1=0
-            if y1+y2 > 128: y2= 128-y1
-
-            if not (y1+y2<0 or y1>128):
-                rect.append((r*4,y1,4,y2,c))
-
-        rect.append(int(disT))
-        rects.append(rect)
-        '''
-        
         slice_length=lineH/31
         points=[lineOff-64+((lineOff+int(slice_length*pp))-64)-(lineOff-64) for pp in range(32)]
-        wall_line=wall_texters["brick"][wall_slice]
+        wall_line=wall_texters[tmt.get_texter()][wall_slice]
         
         rect=[] 
         for wl in wall_line:
@@ -292,8 +252,11 @@ while runing:
         ipx_add_xo = int(px + xo) >> 6
         ipy = int(py) >> 6
         ipy_add_yo = int(py + yo) >> 6
-
-        if mapW[ipy_add_yo * mapX + ipx_add_xo] == 2: mapW[ipy_add_yo * mapX + ipx_add_xo] = 0
+        
+        door_maybe = mapW[ipy_add_yo * mapX + ipx_add_xo]
+        if door_maybe != None:
+            if door_maybe.get_type() == "door": 
+                mapW[ipy_add_yo * mapX + ipx_add_xo] = None
 
     if controler[3]:
         pa -= fps / 8; pa = FixAng(pa)
@@ -322,12 +285,12 @@ while runing:
     ipy_sub_yo=int(py-yo)>>6
 
     if controler[0]:
-        if mapW[int(ipy*mapX+ipx_add_xo)]==0: px+=pdx*(fps/5)
-        if mapW[ipy_add_yo*mapY+ipx]==0: py+=pdy*(fps/5)
+        if mapW[int(ipy*mapX+ipx_add_xo)]==None: px+=pdx*(fps/5)
+        if mapW[ipy_add_yo*mapY+ipx]==None: py+=pdy*(fps/5)
 
     if controler[1]:
-        if mapW[int(ipy*mapX+ipx_sub_xo)]==0: px-=pdx*(fps/5)
-        if mapW[round(ipy_sub_yo)*round(mapX)+round(ipx)]==0: py-=pdy*(fps/5)
+        if mapW[int(ipy*mapX+ipx_sub_xo)]==None: px-=pdx*(fps/5)
+        if mapW[round(ipy_sub_yo)*round(mapX)+round(ipx)]==None: py-=pdy*(fps/5)
 
 
     rects = drawRays2D(rects)
