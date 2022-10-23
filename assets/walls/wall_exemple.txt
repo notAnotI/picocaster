@@ -3,8 +3,8 @@
     (the name of this texter): [
         [
             [
-                start<-(the start posision of the slice, top, 0 to 1),
-                end<-(the end posision of the slice, bottom, 0 to 1),
+                start<-(the start posision of the slice, top, 0 to 31),
+                end<-(the end posision of the slice, bottom, 0 to 31),
                 [
                     R,
                     G,
@@ -12,5 +12,5 @@
                 ]<-(the colour of the slice, top, 0 to 255)
             ]<-(a slice of the vertical line) 
         ]<-(a slice of the texter) 
-    ]<-(a list of 64 items with are all a vertical slice of the texture)
+    ]<-(a list of 32 items with are all a vertical slice of the texture)
 }

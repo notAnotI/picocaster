@@ -247,6 +247,23 @@ def texter_compiler():
     with open("assets/sprites.json", "w") as f:
         f.write(ujson.dumps(com_texters))
 
+   
+   
+    with open("assets/walls/wall_texters.json","r") as f:
+        walls=ujson.loads(f.read())
+    
+    texter_names=walls["texter names"]
+    
+    for t in texter_names:
+        for l in range(len(walls[t])):
+            for s in range(len(walls[t][l])):
+                walls[t][l][s][2]=colour(walls[t][l][s][2])
+   
+    with open("assets/walls.json","w") as f:
+        f.write(ujson.dumps(walls)) 
+
+
+
 
 
 def core2(LCD,rects):

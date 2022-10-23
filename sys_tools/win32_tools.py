@@ -23,7 +23,6 @@ def texter_compiler():
         c_texters=[]
 
         for texter in texters:
-            print(texter)
             texter[0]=x(     texter[0])
             texter[1]=y(     texter[1])
             texter[2]=width( texter[2])
@@ -34,6 +33,16 @@ def texter_compiler():
 
     with open("assets/sprites.json", "w") as f:
         f.write(json.dumps(com_texters))
+
+    with open("assets/walls/wall_texters.json","r") as f:
+        walls=json.loads(f.read())
+    
+    with open("assets/walls.json","w") as f:
+        f.write(json.dumps(walls)) 
+                
+                
+
+
 
 class disp:
     def __init__(self):

@@ -21,17 +21,20 @@ pa = 90
 
 mapW= [
     1,1,1,1,1,1,1,1,
+    1,0,0,1,0,1,0,1,
     1,0,0,1,0,0,0,1,
-    1,0,0,2,0,0,0,1,
-    1,1,2,1,0,0,0,1,
+    1,1,1,1,0,0,0,1,
     1,0,0,0,0,0,0,1,
-    2,0,0,0,0,0,0,1,
     1,0,0,0,0,0,0,1,
+    1,0,0,0,0,0,1,1,
     1,1,1,1,1,1,1,1,
 ]
-global texters_wall,texters_sprite
+global texters_wall,texters_sprite,wall_texters
 with open("assets/sprites.json","r") as f:
     texters_sprite=json.loads(f.read())
+
+with open("assets/walls.json","r") as f:
+    wall_texters=json.loads(f.read())
 
 
 c3=0B1111111111111111
@@ -148,7 +151,7 @@ def drawRays2D(rects):
                 hx=rx
                 hy=ry
                 distH=dist(px,py,hx,hy)
-                hwall=(int(hx)-((int(hx)>>6)<<6))>>3
+                hwall=(int(hx)-((int(hx)>>6)<<6))>>1
 
             else:
                 rx+=xo
@@ -189,7 +192,7 @@ def drawRays2D(rects):
                 vy=ry
                 distV=dist(px,py,vx,vy)
                 vmt=mapW[mp]-1
-                vwall=(int(vy)-((int(vy)>>6)<<6))>>3
+                vwall=(int(vy)-((int(vy)>>6)<<6))>>1
             else:
                 rx+=xo
                 ry+=yo
@@ -197,8 +200,8 @@ def drawRays2D(rects):
 
 
 
-        if distV<distH:rx=vx;ry=vy;disT=distV;c=(155);tmt=vmt;wall=vwall
-        if distV>distH:rx=hx;ry=hy;disT=distH;c=(100);tmt=hmt;wall=hwall
+        if distV<distH:rx=vx;ry=vy;disT=distV;c=(155);tmt=vmt;wall_slice=vwall
+        if distV>distH:rx=hx;ry=hy;disT=distH;c=(100);tmt=hmt;wall_slice=hwall
         #512*256
         ca=FixAng(degToRad((ra/dr)+pa))
 
@@ -216,7 +219,7 @@ def drawRays2D(rects):
         lineOff = 128 - (lineH>>1)
 
 
-
+        '''
         rect=[]
         for pp in range(0,8):
             c=texters_wall[((8*pp)+(64*tmt))+wall]
@@ -230,6 +233,18 @@ def drawRays2D(rects):
             if not (y1+y2<0 or y1>128):
                 rect.append((r*4,y1,4,y2,c))
 
+        rect.append(int(disT))
+        rects.append(rect)
+        '''
+        
+        slice_length=lineH/31
+        points=[lineOff-64+((lineOff+int(slice_length*pp))-64)-(lineOff-64) for pp in range(32)]
+        wall_line=wall_texters["brick"][wall_slice]
+        
+        rect=[] 
+        for wl in wall_line:
+            rect.append((r*4, points[wl[0]], 4, points[wl[1]]-points[wl[0]], wl[2]))
+        
         rect.append(int(disT))
         rects.append(rect)
 
