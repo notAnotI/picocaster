@@ -10,7 +10,7 @@ p3=(3*m.pi)/2
 dr=0.0174533
 
 global spx,spy,spz,spa
-spx,spy,spz,spa=1.55*64.0,5*64.0,20.0,0
+spx,spy,spz,spa=4*64.0,5*64.0,20.0,0
 
 global px,py,pdx,pdy,pa
 px = 1.5*64.0
@@ -40,7 +40,11 @@ with open("assets/sprites.json","r") as f:
 with open("assets/walls.json","r") as f:
     wall_texters=json.loads(f.read())
 
+def angle(x1, y1, x2, y2):
+    return m.atan2(y2-y1, x2-x1)
 
+def get_angle(x1,y1,x2,y2):
+    return m.degrees(m.atan2(y2-y1, x2-x1))
 
 def dist(ax,ay,bx,by):
     return m.sqrt((bx-ax)*(bx-ax)+(by-ay)*(by-ay))
@@ -66,14 +70,22 @@ def draw_sprites(rects):
     b=sx*CS-sy*SN
     sx=a
     sy=b
-
+    
+    angle = FixAng((get_angle(degToRad(px), degToRad(py), degToRad(spx), degToRad(spy))+180)+spa)
 
     sx=(sx*13.0/sy)+10
     sy=(sz*30.0/sy)+8
 
     scale=32*16/b
+    
+    rect=[]
 
-    rect=draw_sprite(scale*2,sx*8,sy*8,texters_sprite["soldier front stand"])
+    if 315<=angle or angle<45  :rect=draw_sprite(scale*2,sx*8,sy*8,texters_sprite["soldier front stand"])
+    if 225<=angle<315 :rect=draw_sprite(scale*2,sx*8,sy*8,texters_sprite["soldier Lside stand"])
+    if 135<=angle<225 :rect=draw_sprite(scale*2,sx*8,sy*8,texters_sprite["soldier back stand"])
+    if 45 <=angle<135 :rect=draw_sprite(scale*2,sx*8,sy*8,texters_sprite["soldier Rside stand"])
+    
+    
 
     rect.append(dist(px,py,spx,spy))
     rects.append(rect)
@@ -226,14 +238,12 @@ def FixAng(a):
 
 
 
-
 controler=[False,False,False,False,False]
 
 display = disp()
 
 runing=True
 while runing:
-
     controler = display.update(controler)
 
     fps = display.get_fps()
