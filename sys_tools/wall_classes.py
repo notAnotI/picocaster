@@ -5,9 +5,6 @@ class wall:
     def get_type(self):
         return "wall"
 
-    def get_texter(self):
-        return self.texter
-
 class door:
     def __init__(self, texter, lock=False, key=None):
         self.texter = texter
@@ -18,9 +15,6 @@ class door:
             self.open = False
         else:
             self.open = True
-
-    def get_texter(self):
-        return self.texter
 
     def get_type(self):
         return "door"

@@ -41,7 +41,8 @@ def texter_compiler():
         f.write(json.dumps(walls)) 
                 
                 
-
+def get_time():
+    return time.perf_counter()
 
 
 class disp:
@@ -49,7 +50,6 @@ class disp:
         self.display=pg.display.set_mode((960,768))
         self.screen=pg.Surface((160,128))
         self.clock=pg.time.Clock()
-        self.k = 0
         self.j = 0
 
 

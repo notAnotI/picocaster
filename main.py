@@ -59,37 +59,37 @@ def draw_sprite(scale,x,y,squares):
 
     return rect
 
-def draw_sprites(rects):
-    sx=spx-px
-    sy=spy-py
-    sz=spz
-
-    CS=m.cos(degToRad(pa))
-    SN=m.sin(degToRad(pa))
-    a=sy*CS+sx*SN
-    b=sx*CS-sy*SN
-    sx=a
-    sy=b
+def draw_sprites(rects, sprites):
+    for  s in sprites:
+        sx=s.x-px
+        sy=s.y-py
+        sz=s.z
     
-    angle = FixAng((get_angle(degToRad(px), degToRad(py), degToRad(spx), degToRad(spy))+180)+spa)
-
-    sx=(sx*13.0/sy)+10
-    sy=(sz*30.0/sy)+8
-
-    scale=32*16/b
+        CS=m.cos(degToRad(pa))
+        SN=m.sin(degToRad(pa))
+        a=sy*CS+sx*SN
+        b=sx*CS-sy*SN
+        sx=a
+        sy=b
+        
+        angle = FixAng((get_angle(degToRad(px), degToRad(py), degToRad(s.x), degToRad(s.y))+180)+s.angle)
     
-    rect=[]
-
-    if 315<=angle or angle<45  :rect=draw_sprite(scale*2,sx*8,sy*8,texters_sprite["soldier front stand"])
-    if 225<=angle<315 :rect=draw_sprite(scale*2,sx*8,sy*8,texters_sprite["soldier Lside stand"])
-    if 135<=angle<225 :rect=draw_sprite(scale*2,sx*8,sy*8,texters_sprite["soldier back stand"])
-    if 45 <=angle<135 :rect=draw_sprite(scale*2,sx*8,sy*8,texters_sprite["soldier Rside stand"])
+        sx=(sx*13.0/sy)+10
+        sy=(sz*30.0/sy)+8
     
+        scale=32*16/b
+        
+        rect=[]
     
-
-    rect.append(dist(px,py,spx,spy))
-    rects.append(rect)
-
+        if 315<=angle or angle<45  :rect=draw_sprite(scale*2,sx*8,sy*8,texters_sprite[s.texters[0]])
+        if 225<=angle<315 :rect=draw_sprite(scale*2,sx*8,sy*8,texters_sprite[s.texters[1]])
+        if 135<=angle<225 :rect=draw_sprite(scale*2,sx*8,sy*8,texters_sprite[s.texters[2]])
+        if 45 <=angle<135 :rect=draw_sprite(scale*2,sx*8,sy*8,texters_sprite[s.texters[3]])
+        
+        
+    
+        rect.append(dist(px,py,s.x,s.y))
+        rects.append(rect)
 
     return rects
 
@@ -211,7 +211,7 @@ def drawRays2D(rects):
 
         slice_length=lineH/31
         points=[lineOff-64+((lineOff+int(slice_length*pp))-64)-(lineOff-64) for pp in range(32)]
-        wall_line=wall_texters[tmt.get_texter()][wall_slice]
+        wall_line=wall_texters[tmt.texter][wall_slice]
         
         rect=[] 
         for wl in wall_line:
@@ -243,6 +243,7 @@ controler=[False,False,False,False,False]
 display = disp()
 
 runing=True
+sprites = [soldier(mapW),]
 while runing:
     controler = display.update(controler)
 
@@ -267,6 +268,8 @@ while runing:
         if door_maybe != None:
             if door_maybe.get_type() == "door": 
                 mapW[ipy_add_yo * mapX + ipx_add_xo] = None
+                for s in sprites:
+                    s.mapW = mapW
 
     if controler[3]:
         pa -= fps / 8; pa = FixAng(pa)
@@ -301,10 +304,12 @@ while runing:
     if controler[1]:
         if mapW[int(ipy*mapX+ipx_sub_xo)]==None: px-=pdx*(fps/5)
         if mapW[round(ipy_sub_yo)*round(mapX)+round(ipx)]==None: py-=pdy*(fps/5)
-
+    
+    for s in sprites:
+        s.update(get_time(), fps)
 
     rects = drawRays2D(rects)
-    rects = draw_sprites(rects)
+    rects = draw_sprites(rects,sprites)
 
     rects = sorted(rects, key=lambda rects: rects[-1],reverse=True)
 
